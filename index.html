@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Veterinaria | Gestión de mascotas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="login-screen" id="loginScreen">
+        <form class="login-card" id="loginForm">
+            <div class="brand login-brand"><span>Veterinaria</span><span class="brand-dot">.</span></div>
+            <h2>Iniciar sesión</h2>
+            <p class="login-copy">Ingresa tus credenciales para acceder al sistema de gestión.</p>
+            <label>Usuario<input name="username" required autocomplete="username" placeholder="Ej. admin"></label>
+            <label>Contraseña<input name="password" type="password" required autocomplete="current-password" placeholder="••••••••"></label>
+            <div class="login-error" id="loginError"></div>
+            <button class="primary-button login-button" type="submit">Ingresar</button>
+            <small class="login-hint">Usuarios de prueba → admin/admin123 · secre/secre123 · vet/vet123</small>
+        </form>
+    </div>
+
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="brand"><span>Veterinaria</span></div>
+            <div class="clinic-switcher">
+                <div>
+                    <strong>Veterinaria</strong>
+                    <small>Panel principal</small>
+                </div>
+            </div>
+            <nav class="main-nav" aria-label="Navegación principal">
+                <p class="nav-label">Espacio de trabajo</p>
+                <button class="nav-item active" data-view="overview" data-label="Resumen">Resumen</button>
+                <button class="nav-item" data-view="clients" data-label="Clientes">Clientes</button>
+                <button class="nav-item" data-view="pets" data-label="Mascotas">Mascotas <span class="nav-count" id="petNavCount">0</span></button>
+                <button class="nav-item" data-view="appointments" data-label="Consultas">Consultas</button>
+                <button class="nav-item" data-view="services" data-label="Servicios">Servicios</button>
+                <p class="nav-label nav-label-spaced">Administración</p>
+                <button class="nav-item" data-view="staff" data-label="Personal y Accesos">Personal y Accesos</button>
+                <button class="nav-item" data-view="vaccines" data-label="Vacunas">Vacunas</button>
+                <button class="nav-item" data-view="payments" data-label="Pagos">Pagos</button>
+                <button class="nav-item" data-view="guarderia" data-label="Guardería">Guardería</button>
+                <button class="nav-item" data-view="cirugias" data-label="Cirugías">Cirugías</button>
+                <button class="nav-item" data-view="inventario" data-label="Inventario">Inventario</button>
+                <button class="nav-item" data-view="reportes" data-label="Reportes">Reportes</button>
+                <button class="nav-item" data-view="settings" data-label="Configuración">Configuración</button>
+            </nav>
+            <div class="sidebar-bottom">
+                <div class="support-card">
+                    <strong>¿Necesitas ayuda?</strong>
+                    <small>Estamos para ayudarte.</small>
+                    <button>Contactar soporte</button>
+                </div>
+                <div class="profile">
+                    <div>
+                        <strong id="profileName">—</strong>
+                        <small id="profileRole">—</small>
+                    </div>
+                    <button class="icon-button" id="logoutBtn" title="Cerrar sesión">Salir</button>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar">
+                <div class="breadcrumb">
+                    <span>Veterinaria</span>
+                    <strong id="breadcrumbPage">Resumen</strong>
+                </div>
+                <div class="top-actions">
+                    <button class="icon-button" title="Notificaciones">Avisos</button>
+                    <button class="icon-button" title="Buscar">Buscar</button>
+                </div>
+            </header>
+            <div class="page-content">
+                <section class="view-section active" id="view-overview">
+                    <div class="page-heading">
+                        <div>
+                            <p class="eyebrow" id="todayLabel">—</p>
+                            <h1>Buenos días</h1>
+                            <p class="heading-copy">Aquí tienes todo lo que está pasando hoy en la clínica.</p>
+                        </div>
+                        <button class="primary-button" data-modal="petModal">Registrar mascota</button>
+                    </div>
+                    <div class="stats-grid">
+                        <article class="stat-card">
+                            <div class="stat-top"><span class="trend neutral">Total</span></div>
+                            <p>Mascotas registradas</p><strong id="statPets">0</strong><small>registradas en el sistema</small>
+                        </article>
+                        <article class="stat-card">
+                            <div class="stat-top"><span class="trend neutral">Mes</span></div>
+                            <p>Consultas este mes</p><strong id="statConsults">0</strong><small>del mes en curso</small>
+                        </article>
+                        <article class="stat-card">
+                            <div class="stat-top"><span class="trend neutral">Al día</span></div>
+                            <p>Vacunas aplicadas</p><strong id="statVaccines">0</strong><small>en los últimos 30 días</small>
+                        </article>
+                        <article class="stat-card">
+                            <div class="stat-top"><span class="trend neutral">Mes</span></div>
+                            <p>Ingresos del mes</p><strong id="statRevenue">$0</strong><small>del mes en curso</small>
+                        </article>
+                    </div>
+                    <div class="dashboard-grid">
+                        <article class="panel schedule-panel">
+                            <div class="panel-header"><div><h2>Agenda de hoy</h2><p>Tu día, de un vistazo.</p></div><button class="text-button" data-view="appointments">Ver agenda</button></div>
+                            <div class="schedule-list" id="scheduleList"></div>
+                        </article>
+                        <article class="panel pets-panel">
+                            <div class="panel-header"><div><h2>Mascotas recientes</h2><p>Últimos registros.</p></div><button class="text-button" data-view="pets">Ver todas</button></div>
+                            <div class="pet-list" id="recentPets"></div>
+                        </article>
+                        <article class="panel reminders-panel">
+                            <div class="panel-header"><div><h2>Recordatorios</h2><p>Próximas vacunas y estancias activas.</p></div></div>
+                            <div class="reminders-list" id="remindersList"></div>
+                        </article>
+                    </div>
+                    <div class="insight-banner"><div><strong>Resumen del día</strong><p id="dailySummaryText">Servicios finalizados hoy: 0 de 0 · Ingresos de hoy: $0</p></div><div class="progress-wrap"><span id="dailySummaryPct">0%</span><div class="progress"><i id="dailySummaryBar"></i></div></div></div>
+                </section>
+
+                <section class="view-section" id="view-clients">
+                    <div class="page-heading compact">
+                        <div><p class="eyebrow">GESTIÓN DE CLIENTES</p><h1>Clientes</h1><p class="heading-copy">Registra y administra la información de contacto de los propietarios.</p></div>
+                        <button class="primary-button" data-modal="clientModal">Registrar cliente</button>
+                    </div>
+                    <div class="toolbar">
+                        <div class="search-input"><input id="clientSearch" placeholder="Buscar por documento, nombre o teléfono..." /></div>
+                    </div>
+                    <div class="table-panel"><table><thead><tr><th>Documento</th><th>Cliente</th><th>Teléfono</th><th>Correo</th><th>Mascotas</th><th>Estado</th><th></th></tr></thead><tbody id="clientsTable"></tbody></table></div>
+                </section>
+
+                <section class="view-section" id="view-pets">
+                    <div class="page-heading compact">
+                        <div><p class="eyebrow">REGISTRO CLÍNICO</p><h1>Mascotas</h1><p class="heading-copy">Gestiona la información, historial y documentos de tus pacientes.</p></div>
+                        <button class="primary-button" data-modal="petModal">Registrar mascota</button>
+                    </div>
+                    <div class="toolbar">
+                        <div class="search-input"><input id="petSearch" placeholder="Buscar por nombre, raza o propietario..." /></div>
+                        <button class="filter-button">Filtros <span>0</span></button>
+                    </div>
+                    <div class="table-panel"><table><thead><tr><th>Mascota</th><th>Especie / raza</th><th>Sexo / edad</th><th>Peso</th><th>Color / obs.</th><th>Propietario</th><th></th></tr></thead><tbody id="petsTable"></tbody></table></div>
+                </section>
+
+                <section class="view-section" id="view-appointments">
+                    <div class="page-heading compact">
+                        <div><p class="eyebrow">SEGUIMIENTO CLÍNICO</p><h1>Consultas y servicios</h1><p class="heading-copy">Registra pagos, notas y el estado de cada atención.</p></div>
+                        <button class="primary-button" data-modal="consultModal">Nueva consulta</button>
+                    </div>
+                    <div class="toolbar">
+                        <select id="agendaVetFilter" title="Filtrar por veterinario"></select>
+                        <input id="agendaDateFilter" type="date" title="Filtrar por fecha" />
+                        <select id="agendaServiceFilter" title="Filtrar por tipo de servicio"></select>
+                        <input id="agendaFromFilter" type="date" title="Desde" />
+                        <input id="agendaToFilter" type="date" title="Hasta" />
+                    </div>
+                    <div class="service-tabs"><button class="active" data-status="Todas">Todas <span id="allConsultCount">0</span></button><button data-status="Programado">Programadas</button><button data-status="En curso">En curso</button><button data-status="Finalizado">Finalizadas</button><button data-status="Cancelado">Canceladas</button></div>
+                    <div class="appointment-list" id="appointmentList"></div>
+                </section>
+
+                <section class="view-section" id="view-services">
+                    <div class="page-heading compact">
+                        <div><p class="eyebrow">CATÁLOGO DE ATENCIÓN</p><h1>Servicios disponibles</h1><p class="heading-copy">Precios, duración estimada y clasificación de cada atención.</p></div>
+                        <div class="heading-actions">
+                            <button class="primary-button" data-modal="consultModal">Agendar servicio</button>
+                            <button class="secondary-button" id="addServiceBtn" data-modal="serviceModal">Nuevo servicio</button>
+                        </div>
+                    </div>
+                    <div class="services-grid" id="servicesGrid"></div>
+                </section>
+
+                <section class="view-section" id="view-staff">
+                    <div class="page-heading compact">
+                        <div><p class="eyebrow">EQUIPO Y ACCESOS</p><h1>Personal y Accesos</h1><p class="heading-copy">Gestión integrada de empleados, cuerpo médico y credenciales de usuario del sistema.</p></div>
+                        <div class="heading-actions">
+                            <button class="primary-button" data-modal="employeeModal">Registrar empleado</button>
+                            <button class="secondary-button" data-modal="vetModal">Registrar veterinario</button>
+                            <button class="secondary-button" data-modal="userModal">Registrar usuario</button>
+                        </div>
+                    </div>
+                    <div class="unified-staff-container">
+                        <div class="staff-section-card">
+                            <h3>Empleados y Personal Laboral</h3>
+                            <div class="table-panel"><table><thead><tr><th>Documento</th><th>Empleado</th><th>Teléfono</th><th>Correo</th><th>Cargo</th><th>Vinculación</th><th>Estado</th><th></th></tr></thead><tbody id="employeesTable"></tbody></table></div>
+                        </div>
+                        <div class="staff-section-card">
+                            <h3>Equipo Médico (Veterinarios)</h3>
+                            <div class="table-panel"><table><thead><tr><th>Nombre</th><th>Matrícula</th><th>Especialidad</th><th>Teléfono</th><th>Estado</th><th></th></tr></thead><tbody id="vetsTable"></tbody></table></div>
+                        </div>
+                        <div class="staff-section-card">
+                            <h3>Usuarios y Permisos del Sistema</h3>
+                            <div class="table-panel"><table><thead><tr><th>Usuario</th><th>Nombre</th><th>Rol</th><th>Estado</th><th></th></tr></thead><tbody id="usersTable"></tbody></table></div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="view-section" id="view-vaccines">
+                    <div class="page-heading compact">
+                        <div><p class="eyebrow">PREVENCIÓN</p><h1>Vacunas</h1><p class="heading-copy">Mantén al día la protección de cada paciente.</p></div>
+                        <button class="primary-button" data-modal="vaccineModal">Registrar vacuna</button>
+                    </div>
+                    <div class="toolbar"><select id="vaccinePetFilter" title="Filtrar historial por mascota"></select></div>
+                    <div class="table-panel"><table><thead><tr><th>Mascota</th><th>Vacuna</th><th>Dosis</th><th>Aplicación</th><th>Próxima dosis</th><th>Veterinario</th><th></th></tr></thead><tbody id="vaccinesTable"></tbody></table></div>
+                </section>
+
+                <section class="view-section" id="view-payments">
+                    <div class="page-heading compact">
+                        <div><p class="eyebrow">TESORERÍA</p><h1>Pagos</h1><p class="heading-copy">Registra cobros con fecha, valor, método y conceptos del servicio.</p></div>
+                        <button class="primary-button" data-modal="paymentModal">Registrar pago</button>
+                    </div>
+                    <p class="summary-line">Total recaudado: <strong id="paymentsTotal">$0</strong></p>
+                    <div class="table-panel"><table><thead><tr><th>Fecha</th><th>Servicio</th><th>Mascota</th><th>Conceptos</th><th>Método</th><th>Total</th><th></th></tr></thead><tbody id="paymentsTable"></tbody></table></div>
+                </section>
+
+                <section class="view-section" id="view-guarderia">
+                    <div class="page-heading compact">
+                        <div><p class="eyebrow">RF-36 / RF-37 · GUARDERÍA</p><h1>Guardería</h1><p class="heading-copy">Registra el ingreso y salida de mascotas; el valor se calcula según horas de estancia y tarifa.</p></div>
+                        <button class="primary-button" data-modal="stayModal">Registrar estancia</button>
+                    </div>
+                    <p class="summary-line">Valor acumulado de estancias: <strong id="staysTotal">$0</strong></p>
+                    <div class="table-panel"><table><thead><tr><th>Mascota</th><th>Ingreso</th><th>Salida</th><th>Horas</th><th>Tarifa</th><th>Valor</th><th>Estado</th><th></th></tr></thead><tbody id="staysTable"></tbody></table></div>
+                </section>
+
+                <section class="view-section" id="view-cirugias">
+                    <div class="page-heading compact">
+                        <div><p class="eyebrow">RF-38 / RF-39 · CIRUGÍAS</p><h1>Cirugías</h1><p class="heading-copy">Programa procedimientos y calcula la compensación del 35% para el veterinario al finalizar.</p></div>
+                        <button class="primary-button" data-modal="surgeryModal">Registrar cirugía</button>
+                    </div>
+                    <p class="summary-line">Compensaciones del equipo médico (35% de cirugías finalizadas): <strong id="surgeryCompTotal">$0</strong></p>
+                    <div class="table-panel"><table><thead><tr><th>Mascota</th><th>Veterinario</th><th>Procedimiento</th><th>Fecha y Hora</th><th>Costo</th><th>Estado</th><th>Compensación (35%)</th><th></th></tr></thead><tbody id="surgeriesTable"></tbody></table></div>
+                </section>
+
+                <section class="view-section" id="view-inventario">
+                    <div class="page-heading compact">
+                        <div><p class="eyebrow">RF-40 / RF-41 / RF-42 · INVENTARIO</p><h1>Inventario</h1><p class="heading-copy">Registra productos y controla entradas y salidas de existencias.</p></div>
+                        <button class="primary-button" data-modal="productModal">Registrar producto</button>
+                    </div>
+                    <p class="summary-line"><span id="lowStockCount">0 productos en alerta de stock mínimo</span></p>
+                    <div class="table-panel"><table><thead><tr><th>Producto</th><th>Categoría</th><th>Cantidad</th><th>Stock mínimo</th><th>Costo unitario</th><th>Valor total</th><th></th></tr></thead><tbody id="productsTable"></tbody></table></div>
+                    <h3 class="subhead">Movimientos recientes (RF-41)</h3>
+                    <div class="table-panel"><table><thead><tr><th>Fecha</th><th>Producto</th><th>Tipo</th><th>Cantidad</th><th>Saldo</th></tr></thead><tbody id="movementsTable"></tbody></table></div>
+                </section>
+
+                <!-- RF-46 / RF-47 / RF-48: Reportes -->
+                <section class="view-section" id="view-reportes">
+                    <div class="page-heading compact">
+                        <div><p class="eyebrow">RF-46 / RF-47 / RF-48 · REPORTES</p><h1>Reportes</h1><p class="heading-copy">Ingresos por período, servicios más solicitados y resumen operativo.</p></div>
+                    </div>
+                    <div class="toolbar">
+                        <input id="reportFromFilter" type="date" title="Desde" />
+                        <input id="reportToFilter" type="date" title="Hasta" />
+                        <button class="secondary-button" id="reportThisMonthBtn" type="button">Este mes</button>
+                    </div>
+                    <div class="stats-grid">
+                        <article class="stat-card">
+                            <div class="stat-top"><span class="trend up">RF-46</span></div>
+                            <p>Ingresos del período</p><strong id="reportIncome">$0</strong>
+                        </article>
+                        <article class="stat-card">
+                            <div class="stat-top"><span class="trend neutral">Pagos</span></div>
+                            <p>Pagos registrados</p><strong id="reportPaymentsCount">0</strong>
+                        </article>
+                        <article class="stat-card">
+                            <div class="stat-top"><span class="trend up">RF-48</span></div>
+                            <p>Servicios del período</p><strong id="reportServicesCount">0</strong>
+                        </article>
+                        <article class="stat-card">
+                            <div class="stat-top"><span class="trend neutral">Promedio</span></div>
+                            <p>Ticket promedio</p><strong id="reportAvgTicket">$0</strong>
+                        </article>
+                    </div>
+                    <div class="dashboard-grid">
+                        <div class="table-panel">
+                            <div class="panel-header"><div><h2>Ingresos del período</h2><p>Detalle de cada cobro realizado.</p></div></div>
+                            <table><thead><tr><th>Fecha</th><th>Mascota</th><th>Servicio</th><th>Método</th><th>Total</th></tr></thead><tbody id="reportIncomeTable"></tbody></table>
+                        </div>
+                        <article class="panel">
+                            <div class="panel-header"><div><h2>Servicios más solicitados</h2><p>Atenciones por tipo de servicio en el período.</p></div></div>
+                            <div style="padding: 0 20px 20px;" id="reportTopServices"></div>
+                        </article>
+                    </div>
+                    <div class="dashboard-grid">
+                        <article class="panel"><div class="panel-header"><div><h2>Motivos de consulta más frecuentes</h2><p>RF-49 · Motivos recurrentes en el período.</p></div></div><div style="padding: 0 20px 20px;" id="reportTopReasons"></div></article>
+                        <div class="table-panel"><div class="panel-header"><div><h2>Compensaciones del equipo médico</h2><p>RF-50 · 35% de las cirugías finalizadas en el período.</p></div></div>
+                            <table><thead><tr><th>Veterinario</th><th>Cirugías</th><th>Valor cirugías</th><th>Compensación</th></tr></thead><tbody id="reportCompTable"></tbody><tfoot><tr><th colspan="3">Total</th><th id="reportCompTotal">$0</th></tr></tfoot></table></div>
+                    </div>
+                    <div class="insight-banner"><div><strong>Resumen del día (RF-47)</strong><p id="reportDailySummary">—</p></div></div>
+                </section>
+
+                <section class="view-section" id="view-settings">
+                    <div class="page-heading compact"><div><p class="eyebrow">VETERINARIA</p><h1>Configuración</h1><p class="heading-copy">Preferencias generales del espacio de trabajo.</p></div></div>
+                    <div class="settings-panel">
+                        <div class="setting-row"><div><strong>Información de la veterinaria</strong><p>Atención veterinaria integral</p></div><button class="icon-button">Editar</button></div>
+                        <div class="setting-row"><div><strong>Notificaciones</strong><p>Recordatorios de consultas y vacunas</p></div><label class="switch"><input type="checkbox" id="notifToggle" checked><span></span></label></div>
+                        <div class="setting-row"><div><strong>Métodos de pago</strong><p>Efectivo, tarjeta y transferencia</p></div><button class="icon-button">Editar</button></div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modales -->
+    <div class="modal-backdrop" id="clientModal">
+        <div class="modal">
+            <button class="modal-close">Cerrar</button>
+            <div class="modal-heading"><div><p class="eyebrow">NUEVO CLIENTE</p><h2>Registrar cliente</h2><p>Completa los datos de contacto del propietario.</p></div></div>
+            <form id="clientForm">
+                <div class="form-grid">
+                    <label>Documento<input name="document" required placeholder="Ej. 1023456789" inputmode="numeric" data-digits-only></label>
+                    <label>Nombres<input name="firstName" required placeholder="Ej. Laura"></label>
+                    <label>Apellidos<input name="lastName" required placeholder="Ej. Gómez"></label>
+                    <label>Teléfono<input name="phone" required placeholder="Ej. 3001234567" inputmode="numeric" data-digits-only></label>
+                    <label>Correo<input name="email" type="email" placeholder="Ej. laura@correo.com"></label>
+                    <label class="full-label">Dirección<input name="address" placeholder="Ej. Calle 10 #5-20"></label>
+                </div>
+                <div class="modal-actions"><button type="button" class="secondary-button modal-cancel">Cancelar</button><button class="primary-button" type="submit">Guardar cliente</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="vetModal">
+        <div class="modal">
+            <button class="modal-close">Cerrar</button>
+            <div class="modal-heading"><div><p class="eyebrow">EQUIPO MÉDICO</p><h2>Registrar veterinario</h2><p>Completa los datos del profesional.</p></div></div>
+            <form id="vetForm">
+                <div class="form-grid">
+                    <label>Nombre completo<input name="name" required placeholder="Ej. Dra. Ana Pérez"></label>
+                    <label>Matrícula profesional<input name="license" required placeholder="Ej. VET-1024"></label>
+                    <label>Especialidad<input name="specialty" placeholder="Ej. Medicina general"></label>
+                    <label>Teléfono<input name="phone" placeholder="Ej. 3100000000" inputmode="numeric" data-digits-only></label>
+                </div>
+                <div class="modal-actions"><button type="button" class="secondary-button modal-cancel">Cancelar</button><button class="primary-button" type="submit">Guardar veterinario</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="userModal">
+        <div class="modal">
+            <button class="modal-close">Cerrar</button>
+            <div class="modal-heading"><div><p class="eyebrow">ACCESO AL SISTEMA</p><h2>Registrar usuario</h2><p>Crea las credenciales y asigna el rol correspondiente.</p></div></div>
+            <form id="userForm">
+                <div class="form-grid">
+                    <label>Usuario<input name="username" required placeholder="Ej. maria.v" autocomplete="off"></label>
+                    <label>Nombre completo<input name="name" required placeholder="Ej. María Vargas"></label>
+                    <label>Contraseña<input name="password" type="password" required minlength="4" placeholder="Mínimo 4 caracteres" autocomplete="off"></label>
+                    <label>Rol<select name="role"><option>Administrador</option><option>Secretaria</option><option>Veterinario</option></select></label>
+                </div>
+                <div class="modal-actions"><button type="button" class="secondary-button modal-cancel">Cancelar</button><button class="primary-button" type="submit">Guardar usuario</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="serviceModal">
+        <div class="modal">
+            <button class="modal-close">Cerrar</button>
+            <div class="modal-heading"><div><p class="eyebrow">CATÁLOGO DE ATENCIÓN</p><h2>Registrar servicio</h2><p>Define nombre, descripción, precio y duración.</p></div></div>
+            <form id="serviceForm">
+                <div class="form-grid">
+                    <label>Nombre del servicio<input name="name" required placeholder="Ej. Cirugía"></label>
+                    <label>Clasificación<select name="category" id="serviceCategory"></select></label>
+                    <label>Precio ($)<input name="price" required type="number" min="1" step="100" placeholder="Ej. 35000"></label>
+                    <label>Duración estimada (min)<input name="duration" required type="number" min="5" step="5" placeholder="Ej. 30"></label>
+                    <label class="full-label">Descripción<input name="description" placeholder="Ej. Evaluación de salud"></label>
+                    <label class="full-label checkbox-label"><input type="checkbox" name="active" checked> Disponible para agendar</label>
+                </div>
+                <div class="modal-actions"><button type="button" class="secondary-button modal-cancel">Cancelar</button><button class="primary-button" type="submit">Guardar servicio</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="employeeModal">
+        <div class="modal">
+            <button class="modal-close">Cerrar</button>
+            <div class="modal-heading"><div><p class="eyebrow">EQUIPO DE TRABAJO</p><h2>Registrar empleado</h2><p>Completa los datos laborales y de contacto.</p></div></div>
+            <form id="employeeForm">
+                <div class="form-grid">
+                    <label>Documento<input name="document" required placeholder="Ej. 1020304050" inputmode="numeric" data-digits-only></label>
+                    <label>Nombre completo<input name="name" required placeholder="Ej. Camila Torres"></label>
+                    <label>Teléfono<input name="phone" required placeholder="Ej. 3101112233" inputmode="numeric" data-digits-only></label>
+                    <label>Correo<input name="email" type="email" placeholder="Ej. camila@vet.com"></label>
+                    <label>Cargo<select name="position" id="employeePosition"></select></label>
+                    <label>Fecha de vinculación<input name="hireDate" type="date" required></label>
+                </div>
+                <div class="modal-actions"><button type="button" class="secondary-button modal-cancel">Cancelar</button><button class="primary-button" type="submit">Guardar empleado</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="petModal">
+        <div class="modal">
+            <button class="modal-close">Cerrar</button>
+            <div class="modal-heading"><div><p class="eyebrow">NUEVO REGISTRO</p><h2>Registrar mascota</h2><p>Completa los datos básicos y adjunta documentos o exámenes médicos.</p></div></div>
+            <form id="petForm">
+                <div class="form-grid">
+                    <label>Nombre de la mascota<input name="name" required placeholder="Ej. Milo"></label>
+                    <label>Propietario (cliente)<select name="clientId" id="petClient" required></select></label>
+                    <label>Especie<select name="species"><option>Perro</option><option>Gato</option><option>Ave</option><option>Otro</option></select></label>
+                    <label>Raza<input name="breed" required placeholder="Ej. Beagle"></label>
+                    <label>Sexo<select name="sex"><option>Macho</option><option>Hembra</option></select></label>
+                    <label>Edad<input name="age" required type="number" min="0" placeholder="Años"></label>
+                    <label>Peso (kg)<input name="weight" required type="number" min="0" step="0.1" placeholder="0.0"></label>
+                    <label>Color<input name="color" placeholder="Ej. Tricolor"></label>
+                    <label class="full-label">Adjuntar exámenes o documentos <input type="file" name="documentFile" id="petDocFile" multiple></label>
+                    <label class="full-label">Observaciones<textarea name="notes" placeholder="Alergias, condiciones especiales..."></textarea></label>
+                </div>
+                <div class="modal-actions"><button type="button" class="secondary-button modal-cancel">Cancelar</button><button class="primary-button" type="submit">Guardar mascota</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="petDetailModal">
+        <div class="modal modal-wide">
+            <button class="modal-close">Cerrar</button>
+            <div class="modal-heading"><div><p class="eyebrow">FICHA DEL PACIENTE</p><h2>Detalle de mascota</h2><p>Información clínica, historial y documentos adjuntos.</p></div></div>
+            <div id="petDetailBody"></div>
+            <div class="modal-actions"><button type="button" class="secondary-button modal-cancel">Cerrar</button></div>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="consultModal">
+        <div class="modal">
+            <button class="modal-close">Cerrar</button>
+            <div class="modal-heading"><div><p class="eyebrow">NUEVA ATENCIÓN</p><h2>Registrar consulta</h2><p>Programa el servicio indicando mascota, fecha, hora y veterinario.</p></div></div>
+            <form id="consultForm">
+                <div class="form-grid">
+                    <label>Mascota<select name="pet" id="consultPet" required></select></label>
+                    <label>Servicio<select name="service" id="consultService"></select></label>
+                    <label>Fecha<input name="date" type="date" required></label>
+                    <label>Hora<input name="time" type="time" value="09:00" required></label>
+                    <label>Veterinario<select name="vet" id="consultVet" required></select></label>
+                    <label>Estado<select name="status"><option>Programado</option><option>En curso</option><option>Finalizado</option></select></label>
+                    <label>Método de pago<select name="payment"><option>Tarjeta</option><option>Efectivo</option><option>Transferencia</option><option>Sin pago</option></select></label>
+                    <label class="full-label">Motivo de visita<input name="motivo" required placeholder="Ej. Revisión anual"></label>
+                    <label class="full-label clinical">Diagnóstico<textarea name="diagnostico" placeholder="Diagnóstico..."></textarea></label>
+                    <label class="full-label clinical">Medicamentos prescritos<textarea name="medicamentos" placeholder="Medicamentos..."></textarea></label>
+                    <label class="full-label clinical">Recomendaciones<textarea name="recomendaciones" placeholder="Recomendaciones..."></textarea></label>
+                    <label class="full-label">Observaciones<textarea name="notes" placeholder="Notas..."></textarea></label><label>Próximo chequeo<input name="nextCheckup" type="date"></label><label class="full-label">Adjuntar resultados de exámenes<input type="file" name="docs" multiple></label>
+                </div>
+                <div class="modal-actions"><button type="button" class="secondary-button modal-cancel">Cancelar</button><button class="primary-button" type="submit">Guardar consulta</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="editConsultModal">
+        <div class="modal">
+            <button class="modal-close">Cerrar</button>
+            <div class="modal-heading"><div><p class="eyebrow">GESTIÓN DE CONSULTA</p><h2>Modificar consulta</h2><p>Reprograma o actualiza detalles clínicos.</p></div></div>
+            <form id="editConsultForm">
+                <input type="hidden" name="id">
+                <div class="form-grid">
+                    <label>Mascota<select name="pet" id="editConsultPet"></select></label>
+                    <label>Servicio<select name="service" id="editConsultService"></select></label>
+                    <label>Fecha<input name="date" type="date" required></label>
+                    <label>Hora<input name="time" type="time" required></label>
+                    <label>Veterinario<select name="vet" id="editConsultVet"></select></label>
+                    <label>Estado<select name="status" id="editConsultStatus"></select></label>
+                    <label>Método de pago<select name="payment"><option>Tarjeta</option><option>Efectivo</option><option>Transferencia</option><option>Sin pago</option></select></label>
+                    <label class="full-label">Motivo de visita<input name="motivo" required></label>
+                    <label class="full-label clinical">Diagnóstico<textarea name="diagnostico"></textarea></label>
+                    <label class="full-label clinical">Medicamentos prescritos<textarea name="medicamentos"></textarea></label>
+                    <label class="full-label clinical">Recomendaciones<textarea name="recomendaciones"></textarea></label>
+                    <label class="full-label">Observaciones<textarea name="notes"></textarea></label><label>Próximo chequeo<input name="nextCheckup" type="date"></label><label class="full-label">Adjuntar resultados de exámenes<input type="file" name="docs" multiple></label>
+                </div>
+                <div class="modal-actions"><button type="button" class="secondary-button modal-cancel">Cancelar</button><button class="primary-button" type="submit">Guardar cambios</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="cancelConsultModal">
+        <div class="modal">
+            <button class="modal-close">Cerrar</button>
+            <div class="modal-heading"><div><p class="eyebrow">CANCELAR SERVICIO</p><h2>Cancelar consulta</h2><p>El servicio pasará a estado Cancelado.</p></div></div>
+            <form id="cancelConsultForm">
+                <input type="hidden" name="id">
+                <div class="cancel-summary" id="cancelSummary"></div>
+                <div class="form-grid"><label class="full-label">Motivo de cancelación<textarea name="motive" required placeholder="Motivo..."></textarea></label></div>
+                <div class="modal-actions"><button type="button" class="secondary-button modal-cancel">Volver</button><button class="primary-button danger-button" type="submit">Confirmar cancelación</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="vaccineModal">
+        <div class="modal">
+            <button class="modal-close">Cerrar</button>
+            <div class="modal-heading"><div><p class="eyebrow">HISTORIAL DE PREVENCIÓN</p><h2>Registrar vacuna</h2><p>Actualiza vacunas aplicadas.</p></div></div>
+            <form id="vaccineForm">
+                <div class="form-grid">
+                    <label>Mascota<select name="pet" id="vaccinePet"></select></label>
+                    <label>Vacuna<input name="vaccine" required placeholder="Ej. Rabia"></label>
+                    <label>Dosis<input name="dose" placeholder="Ej. 1 ml"></label>
+                    <label>Veterinario<select name="vet" id="vaccineVet" required></select></label>
+                    <label>Fecha de aplicación<input name="date" type="date" required></label>
+                    <label>Próxima dosis<input name="nextDate" type="date"></label>
+                </div>
+                <div class="modal-actions"><button type="button" class="secondary-button modal-cancel">Cancelar</button><button class="primary-button" type="submit">Guardar vacuna</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="paymentModal">
+        <div class="modal">
+            <button class="modal-close">Cerrar</button>
+            <div class="modal-heading"><div><p class="eyebrow">RF-43 / RF-44 · REGISTRO DE PAGO</p><h2>Registrar pago</h2><p>Asocia cobro a una consulta y calcula el total por conceptos.</p></div></div>
+            <form id="paymentForm">
+                <div class="form-grid">
+                    <label class="full-label">Consulta asociada<select name="consult" id="paymentConsult" required></select></label>
+                    <label>Fecha<input name="date" type="date" required></label>
+                    <label>Método de pago<select name="method"><option>Tarjeta</option><option>Efectivo</option><option>Transferencia</option></select></label>
+                </div>
+                <div class="concept-section">
+                    <div class="concept-head"><strong>Conceptos</strong><button type="button" class="text-button" id="addConceptBtn">+ Agregar concepto</button></div>
+                    <div id="conceptRows"></div>
+                    <div class="payment-total"><span>Total</span><strong id="paymentTotal">$0</strong></div>
+                </div>
+                <div class="modal-actions"><button type="button" class="secondary-button modal-cancel">Cancelar</button><button class="primary-button" type="submit">Guardar pago</button></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- RF-45: Modal del comprobante de pago -->
+    <div class="modal-backdrop" id="receiptModal">
+        <div class="modal">
+            <button class="modal-close">Cerrar</button>
+            <div class="modal-heading"><div><p class="eyebrow">RF-45 · COMPROBANTE</p><h2>Comprobante de pago</h2><p>Constancia del cobro realizado con cliente, mascota y servicio.</p></div></div>
+            <div class="receipt" id="receiptBody"></div>
+            <div class="modal-actions">
+                <button type="button" class="secondary-button modal-cancel">Cerrar</button>
+                <button class="primary-button" id="printReceiptBtn" type="button">Imprimir</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="stayModal">
+        <div class="modal">
+            <button class="modal-close">Cerrar</button>
+            <div class="modal-heading"><div><p class="eyebrow">RF-36 · GUARDERÍA</p><h2>Registrar estancia</h2><p>Indica la mascota, el ingreso y la tarifa por hora.</p></div></div>
+            <form id="stayForm">
+                <div class="form-grid">
+                    <label>Mascota<select name="pet" id="stayPet" required></select></label>
+                    <label>Fecha y hora de ingreso<input name="checkIn" type="datetime-local" required></label>
+                    <label>Tarifa por hora ($)<input name="rate" required type="number" min="0" step="100" placeholder="Ej. 5000"></label>
+                </div>
+                <div class="modal-actions"><button type="button" class="secondary-button modal-cancel">Cancelar</button><button class="primary-button" type="submit">Guardar estancia</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="surgeryModal">
+        <div class="modal">
+            <button class="modal-close">Cerrar</button>
+            <div class="modal-heading"><div><p class="eyebrow">RF-38 · CIRUGÍAS</p><h2>Registrar cirugía</h2><p>Programa el procedimiento con mascota, hora, veterinario y costo.</p></div></div>
+            <form id="surgeryForm">
+                <input type="hidden" name="id">
+                <div class="form-grid">
+                    <label>Mascota<select name="pet" id="surgeryPet" required></select></label>
+                    <label>Veterinario<select name="vet" id="surgeryVet" required></select></label>
+                    <label>Fecha programada<input name="date" type="date" required></label>
+                    <label>Hora<input name="time" type="time" value="08:00" required></label>
+                    <label>Costo ($)<input name="cost" required type="number" min="0" step="1000" placeholder="Ej. 250000"></label>
+                    <label>Estado<select name="status"><option>Programada</option><option>Finalizada</option></select></label>
+                    <label class="full-label">Procedimiento<input name="procedure" required placeholder="Ej. Esterilización"></label>
+                </div>
+                <div class="modal-actions"><button type="button" class="secondary-button modal-cancel">Cancelar</button><button class="primary-button" type="submit">Guardar cirugía</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="productModal">
+        <div class="modal">
+            <button class="modal-close">Cerrar</button>
+            <div class="modal-heading"><div><p class="eyebrow">RF-40 · INVENTARIO</p><h2>Registrar producto</h2><p>Define categoría, cantidad, stock mínimo y costo.</p></div></div>
+            <form id="productForm">
+                <div class="form-grid">
+                    <label>Nombre del producto<input name="name" required placeholder="Ej. Alimento premium"></label>
+                    <label>Categoría<select name="category" id="productCategory"></select></label>
+                    <label>Cantidad inicial<input name="quantity" required type="number" min="0" placeholder="Ej. 20"></label>
+                    <label>Stock mínimo<input name="minStock" required type="number" min="0" placeholder="Ej. 5"></label>
+                    <label>Costo unitario ($)<input name="cost" required type="number" min="0" step="100" placeholder="Ej. 85000"></label>
+                </div>
+                <div class="modal-actions"><button type="button" class="secondary-button modal-cancel">Cancelar</button><button class="primary-button" type="submit">Guardar producto</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="movementModal">
+        <div class="modal">
+            <button class="modal-close">Cerrar</button>
+            <div class="modal-heading"><div><p class="eyebrow">RF-41 · MOVIMIENTOS</p><h2>Registrar movimiento</h2><p>Registra entradas o salidas de existencias.</p></div></div>
+            <form id="movementForm">
+                <input type="hidden" name="productId">
+                <div class="form-grid">
+                    <label>Tipo de movimiento<select name="type"><option>Entrada</option><option>Salida</option></select></label>
+                    <label>Cantidad<input name="quantity" required type="number" min="1" placeholder="Ej. 10"></label>
+                </div>
+                <div class="cancel-summary" id="movementSummary"></div>
+                <div class="modal-actions"><button type="button" class="secondary-button modal-cancel">Cancelar</button><button class="primary-button" type="submit">Guardar movimiento</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"><span></span></div>
+    <script src="js/script.js"></script>
+</body>
+</html>
